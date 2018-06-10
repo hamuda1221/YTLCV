@@ -5,6 +5,7 @@ Created on Sun Jun 10 22:35:04 2018
 @author: hamuda
 """
 
+import time
 import json
 import os
 import httplib2
@@ -17,7 +18,6 @@ if os.path.exists(credentials_path):
     # 認証済み
     store = Storage(credentials_path)
     credentials = store.get()
-    print(credentials)
 else:
     # 認証処理
     f = "client.json"
@@ -27,8 +27,9 @@ else:
     credentials = tools.run_flow(flow, Storage(credentials_path))
     
 http = credentials.authorize(httplib2.Http())
+
 url = "https://www.googleapis.com/youtube/v3/liveBroadcasts?part=snippet&id="
-url += "6dZq7y_oLzI"
+url += "w3C1gFnEQgI"
 res, data = http.request(url)
 data = json.loads(data.decode())
 
@@ -39,17 +40,18 @@ pageToken = None
 url = "https://www.googleapis.com/youtube/v3/liveChat/messages?part=snippet,authorDetails"
 url += "&liveChatId=" + chat_id
 
+url2 = url
+
 while True:
     if pageToken:
-        url += "&pageToken=" + pageToken
+        url2 = url + "&pageToken=" + pageToken
 
-    res, data = http.request(url)
+    res, data = http.request(url2)
     data = json.loads(data.decode())
 
     for datum in data["items"]:
         print(datum["authorDetails"]["displayName"])
         print(datum["snippet"]["textMessageDetails"]["messageText"])
         print(datum["authorDetails"]["profileImageUrl"])
-
     pageToken = data["nextPageToken"]
-    # time.sleep(3)
+    time.sleep(3)
