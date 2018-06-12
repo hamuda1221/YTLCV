@@ -28,12 +28,12 @@ else:
     
 http = credentials.authorize(httplib2.Http())
 
-url = "https://www.googleapis.com/youtube/v3/liveBroadcasts?part=snippet&id="
-url += "w3C1gFnEQgI"
+
+url = "https://www.googleapis.com/youtube/v3/videos?part=liveStreamingDetails&id="
+url += "j1YpR18S5uA"
 res, data = http.request(url)
 data = json.loads(data.decode())
-
-chat_id = data["items"][0]["snippet"]["liveChatId"]
+chat_id = data["items"][0]["liveStreamingDetails"]["activeLiveChatId"]
 print(chat_id)
 
 pageToken = None
@@ -41,7 +41,7 @@ url = "https://www.googleapis.com/youtube/v3/liveChat/messages?part=snippet,auth
 url += "&liveChatId=" + chat_id
 
 url2 = url
-
+chat_no = 0
 while True:
     if pageToken:
         url2 = url + "&pageToken=" + pageToken
@@ -50,8 +50,11 @@ while True:
     data = json.loads(data.decode())
 
     for datum in data["items"]:
-        print(datum["authorDetails"]["displayName"])
-        print(datum["snippet"]["textMessageDetails"]["messageText"])
-        print(datum["authorDetails"]["profileImageUrl"])
+        print(str(chat_no) + str(" | ") +\
+              datum["authorDetails"]["displayName"] + str(" | ") +\
+              datum["snippet"]["textMessageDetails"]["messageText"])
+              #datum["authorDetails"]["profileImageUrl"])
+        #print(datum["snippet"]["textMessageDetails"]["messageText"])
+        chat_no += 1
     pageToken = data["nextPageToken"]
-    time.sleep(3)
+    time.sleep(5)
