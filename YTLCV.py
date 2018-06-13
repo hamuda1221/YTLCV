@@ -30,7 +30,7 @@ http = credentials.authorize(httplib2.Http())
 
 
 url = "https://www.googleapis.com/youtube/v3/videos?part=liveStreamingDetails&id="
-url += "j1YpR18S5uA"
+url += "Vy1RbiSvHoU"
 res, data = http.request(url)
 data = json.loads(data.decode())
 chat_id = data["items"][0]["liveStreamingDetails"]["activeLiveChatId"]
@@ -50,11 +50,22 @@ while True:
     data = json.loads(data.decode())
 
     for datum in data["items"]:
-        print(str(chat_no) + str(" | ") +\
-              datum["authorDetails"]["displayName"] + str(" | ") +\
-              datum["snippet"]["textMessageDetails"]["messageText"])
-              #datum["authorDetails"]["profileImageUrl"])
-        #print(datum["snippet"]["textMessageDetails"]["messageText"])
+        try:
+            if datum["authorDetails"]["isChatModerator"] == True:
+                print("==========================================================")
+                
+            print(str(chat_no) + str(" | ") +\
+                  datum["authorDetails"]["displayName"] + str(" | ") +\
+                  datum["snippet"]["textMessageDetails"]["messageText"])
+                  #datum["authorDetails"]["profileImageUrl"])
+                  
+            if datum["authorDetails"]["isChatModerator"] == True:
+                print("==========================================================")
+        except KeyError:
+            print(str(chat_no) + str(" | ") +\
+                  #datum["authorDetails"]["displayName"] + str(" | ") +\
+                  datum["snippet"]["displayMessage"])
+                  #datum["authorDetails"]["profileImageUrl"])
         chat_no += 1
     pageToken = data["nextPageToken"]
-    time.sleep(5)
+    time.sleep(3)
