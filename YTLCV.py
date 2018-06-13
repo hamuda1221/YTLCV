@@ -5,10 +5,13 @@ Created on Sun Jun 10 22:35:04 2018
 @author: hamuda
 """
 
+import sys
 import time
 import json
 import os
 import httplib2
+import tkinter as tk
+import tkinter.ttk as ttk
 from oauth2client import tools
 from oauth2client import client
 from oauth2client.file import Storage
@@ -28,6 +31,18 @@ else:
     
 http = credentials.authorize(httplib2.Http())
 
+
+root = tk.Tk()
+root.title("YoutubeLiveCommentViewer")
+root.minsize(300, 200)
+root.columnconfigure(0, weight = 1)
+root.rowconfigure(0, weight = 1)
+
+sizegrip = ttk.Sizegrip(root)
+sizegrip.grid(row = 1, column = 0, sticky = (tk.S, tk.E))
+
+root.mainloop()
+"""
 
 url = "https://www.googleapis.com/youtube/v3/videos?part=liveStreamingDetails&id="
 url += "Vy1RbiSvHoU"
@@ -69,3 +84,5 @@ while True:
         chat_no += 1
     pageToken = data["nextPageToken"]
     time.sleep(3)
+
+"""
