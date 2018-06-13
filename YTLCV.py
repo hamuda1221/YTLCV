@@ -16,32 +16,63 @@ from oauth2client import tools
 from oauth2client import client
 from oauth2client.file import Storage
 
-credentials_path = "credentials.json"
-if os.path.exists(credentials_path):
-    # 認証済み
-    store = Storage(credentials_path)
-    credentials = store.get()
-else:
-    # 認証処理
-    f = "client.json"
-    scope = "https://www.googleapis.com/auth/youtube.readonly"
-    flow = client.flow_from_clientsecrets(f, scope)
-    flow.user_agent = "hoge"
-    credentials = tools.run_flow(flow, Storage(credentials_path))
+http, url = None, None
+
+def pushButton(event):
+    #ボタンが押されたらコメントを読み取り始める
+    credentials_path = "credentials.json"
+    if os.path.exists(credentials_path):
+        # 認証済み
+        store = Storage(credentials_path)
+        credentials = store.get()
+    else:
+        # 認証処理
+        f = "client.json"
+        scope = "https://www.googleapis.com/auth/youtube.readonly"
+        flow = client.flow_from_clientsecrets(f, scope)
+        flow.user_agent = "hoge"
+        credentials = tools.run_flow(flow, Storage(credentials_path))
+        
+    global http
+    http = credentials.authorize(httplib2.Http())
     
-http = credentials.authorize(httplib2.Http())
+    global url
+    url = URLBox.get()
+    index1 = url.find('=')
+    url2 = url[index1 + 1 :]
+    url = "https://www.googleapis.com/youtube/v3/videos?part=liveStreamingDetails&id="
+    url += url2
+    res, data = http.request(url)
+    data = json.loads(data.decode())
+    chat_id = data["items"][0]["liveStreamingDetails"]["activeLiveChatId"]
+    print(chat_id)
 
+    
 
+#ウィンドウの作成
 root = tk.Tk()
 root.title("YoutubeLiveCommentViewer")
-root.minsize(300, 200)
+root.minsize(600, 200)
 root.columnconfigure(0, weight = 1)
 root.rowconfigure(0, weight = 1)
 
-sizegrip = ttk.Sizegrip(root)
-sizegrip.grid(row = 1, column = 0, sticky = (tk.S, tk.E))
+frame1 = tk.Frame(root, pady = 10)
+frame1.pack()
+
+labe1 = tk.Label(frame1, font=("", 14), text="生放送URL")
+labe1.grid(column = 0, row = 0, padx=5, pady=5, sticky = (tk.W))
+URLBox = tk.Entry(frame1, font=("", 14), width = 42)
+URLBox.grid(column = 1, row = 0, padx=5, pady=5, sticky = (tk.W, tk.E))
+button1 = tk.Button(frame1, text="接続")
+button1.grid(column = 2, row = 0, padx=5, pady=5, sticky = (tk.E))
+
+button1.bind("<Button-1>",pushButton) 
+
+if http != None and url != None:
+    print(http, url)
 
 root.mainloop()
+
 """
 
 url = "https://www.googleapis.com/youtube/v3/videos?part=liveStreamingDetails&id="
