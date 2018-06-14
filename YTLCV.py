@@ -16,9 +16,10 @@ import tkinter.ttk as ttk
 from oauth2client import tools
 from oauth2client import client
 from oauth2client.file import Storage
+import wx.lib.scrolledpanel as scrolled
 
 pageToken, http, url, ffffff, chat_no, rrrr = None, None, None, 0, 0, 0
-
+texttt = ""
 """
 def pushButton(event):
     #ボタンが押されたらコメントを読み取り始める
@@ -115,15 +116,19 @@ class MyApp(wx.Frame):
         self.SetPosition((1080, 35))
         self.SetSize((800, 1000))
         
-        self.panel = wx.Panel(self, -1)
-        self.panel_chat = wx.BoxSizer(wx.VERTICAL)
+        self.panel = wx.Panel(self, size = (775, 30), pos = (5, 5), style = wx.BORDER_SIMPLE)
+        self.panel2 = wx.Panel(self, -1, size = (775, 915), pos = (5, 40), style = wx.BORDER_SIMPLE)
+        #self.panel2.SetupScrolling()
+        self.panel2.SetBackgroundColour('#FFFFFF')
+        #self.panel_chat = wx.BoxSizer(wx.VERTICAL)
+        self.text = wx.StaticText(self.panel2, -1, label = texttt, size = (760, 900), pos = (0, 0))
         self.panel_ui1 = wx.BoxSizer(wx.HORIZONTAL)
         
-        self.label_URL = wx.StaticText(self.panel, -1, "動画URL")#, size = (50, 35), pos = (0, 5))
-        self.box = wx.TextCtrl(self.panel, -1, size = (300, 20))#, pos = (55,5))
+        self.label_URL = wx.StaticText(self.panel, -1, "動画URL", size = (50, 20), pos = (0, 5))
+        self.box = wx.TextCtrl(self.panel, -1, size = (300, 20), pos = (55,5))
         
 
-        btn_URL = wx.Button(self.panel, -1, "接続")#, size = (70, 30), pos = (305, 5))
+        btn_URL = wx.Button(self.panel, -1, "接続", size = (70, 20), pos = (360, 5))
         btn_URL.Bind(wx.EVT_BUTTON, self.clicked)
      
         #self.panel_R = wx.Panel(self, -1, size = (380, 400), pos = (10, 60))
@@ -131,12 +136,11 @@ class MyApp(wx.Frame):
         
         #self.label_jp = wx.StaticText(panel_ui1, -1, "", size = (355, 200))
         
-        self.panel_chat.Add(self.panel_ui1)
         self.panel_ui1.Add(self.label_URL)
         self.panel_ui1.Add(self.box)
         self.panel_ui1.Add(btn_URL)
         
-        self.panel.SetSizer(self.panel_chat)
+        #self.panel2.SetSizer(self.panel_chat)
         
         """
         panel_B = wx.Panel(self, -1, pos = (210, 60), size = (180, 210))
@@ -150,7 +154,7 @@ class MyApp(wx.Frame):
         #コメント更新用
         self.timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.roop)
-        self.timer.Start(5000)
+        self.timer.Start(3000)
 
 
         self.Show(True)
@@ -164,6 +168,7 @@ class MyApp(wx.Frame):
         global ffffff
         global chat_no
         global rrrr
+        global texttt
 
         if rrrr != 0:
     
@@ -178,33 +183,40 @@ class MyApp(wx.Frame):
             json.dump(data.decode(), f)
             data = json.loads(data.decode())
             
+            try:
+                for datum in data["items"]:
+                    """
+                    if datum["snippet"]["superChatDetails"] == True:
+                        text1_1.insert(str(chat_no + 1) + ".0", str(chat_no) + "\n")
+                        text1_3.insert(str(chat_no + 1) + ".0", str(datum["snippet"]["displayMessage"]) + "\n")
+                        #datum["authorDetails"]["profileImageUrl"])
+                    """
+                    try:
+                        if datum["authorDetails"]["isChatModerator"] == True:
+                            print("==========================================================")
+    
+                        texttt = (str("\n") + str("    ") + str(chat_no) + str(" | ") +\
+                                  datum["authorDetails"]["displayName"] + str(" | ") +\
+                                  datum["snippet"]["textMessageDetails"]["messageText"] +\
+                                  texttt)
+                        #datum["authorDetails"]["profileImageUrl"])
+                    except KeyError:
+                        print("error")
+                        
+                    chat_no += 1
+                    #self.panel_chat.Add(text, proportion=0)
+                    #self.panel_chat.Layout()
+                    self.text.SetLabel(texttt)
+                    #print(text_array)
+                    
+                    pageToken = data["nextPageToken"]
+                    
+            except KeyError as e:
+                if e.args == ('items',):
+                    print("no items")
+                else:
+                    print("unknow error")
             
-            for datum in data["items"]:
-                """
-                if datum["snippet"]["superChatDetails"] == True:
-                    text1_1.insert(str(chat_no + 1) + ".0", str(chat_no) + "\n")
-                    text1_3.insert(str(chat_no + 1) + ".0", str(datum["snippet"]["displayMessage"]) + "\n")
-                    #datum["authorDetails"]["profileImageUrl"])
-                """
-                try:
-                    if datum["authorDetails"]["isChatModerator"] == True:
-                        print("==========================================================")
-
-                    text = (str("    ") + str(chat_no) + str(" | ") +\
-                            datum["authorDetails"]["displayName"] + str(" | ") +\
-                            datum["snippet"]["textMessageDetails"]["messageText"])
-                    #datum["authorDetails"]["profileImageUrl"])
-                    text = wx.StaticText(self.panel, -1, text)
-                    text.SetForegroundColour('#000000')
-                except KeyError:
-                    print("error")
-                chat_no += 1
-                self.panel_chat.Add(text, proportion=0)
-                self.panel_chat.Layout()
-                #self.label_jp.SetLabel(text)
-                print(chat_no)
-
-            pageToken = data["nextPageToken"]
     
     
     
