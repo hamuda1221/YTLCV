@@ -108,12 +108,40 @@ class MyApp(wx.Frame):
 
     def init_ui(self):
         self.SetTitle('test')
-        self.SetBackgroundColour((0, 255, 0))
-        #self.SetPosition((200, 100))
-        self.SetSize((400, 300))
+        self.SetBackgroundColour((21, 31, 42))
+        self.SetPosition((1450, 530))
+        self.SetSize((420, 320))
+        
+        panel_URL = wx.Panel(self, -1, size = (380, 40), pos = (10, 10))
+        panel_URL.SetBackgroundColour((41, 62, 84))
+        self.label_URL = wx.StaticText(panel_URL, -1, "動画URL", size = (50, 35), pos = (0, 5))
+        self.box = wx.TextCtrl(panel_URL, -1, size = (245, 30), pos = (55,5))
+
+        btn_URL = wx.Button(panel_URL, -1, "接続", size = (70, 30), pos = (305, 5))
+        btn_URL.Bind(wx.EVT_BUTTON, self.clicked)
+        
+     
+        panel_R = wx.Panel(self, -1, pos = (10, 60), size = (180, 210))
+        panel_R.SetBackgroundColour((255, 0, 0))
+        
+        panel_ui1 = wx.Panel(panel_R, -1, pos = (5, 5), size=(175, 205))
+        self.label_jp = wx.StaticText(panel_ui1, -1, "てすとpppp", size = (170, 200))
+        
+        panel_B = wx.Panel(self, -1, pos = (210, 60), size = (180, 210))
+        panel_B.SetBackgroundColour((0, 0, 255))
+
+        panel_ui2 = wx.Panel(panel_B, -1, pos = (5, 5), size=(175, 205))
+        self.label_en = wx.StaticText(panel_ui2, -1, "", size = (170, 200))
+        self.label_en.SetLabel("aaaaaaaaaaaaaaaaaaaaaaaaa.")
+
         self.Show()
+        
+        
+    def clicked(self, event):
+        text = self.box.GetValue()
+        self.label_jp.SetLabel(text)           
 
-
+        
 app = wx.App()
 MyApp(None)
 app.MainLoop()
