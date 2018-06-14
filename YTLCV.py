@@ -5,6 +5,7 @@ Created on Sun Jun 10 22:35:04 2018
 @author: hamuda
 """
 
+import wx
 import sys
 import time
 import json
@@ -96,8 +97,30 @@ def roop():
     #time.sleep(3)
     root.after(5000, roop)
 
+
+#ウィンドの作成
+class MyApp(wx.Frame):
+
+    def __init__(self, *args, **kw):
+        super(MyApp, self).__init__(*args, **kw)
+
+        self.init_ui()
+
+    def init_ui(self):
+        self.SetTitle('test')
+        self.SetBackgroundColour((0, 255, 0))
+        #self.SetPosition((200, 100))
+        self.SetSize((400, 300))
+        self.Show()
+
+
+app = wx.App()
+MyApp(None)
+app.MainLoop()
+
+
     
-    
+"""   
     
 #ウィンドウの作成
 root = tk.Tk()
@@ -129,7 +152,7 @@ text1_2.grid(column = 1, row = 1, sticky = (tk.N, tk.S, tk.E, tk.W))
 text1_3 = tk.Text(text1, width = 50)
 text1_3.grid(column = 2, row = 1, sticky = (tk.N, tk.S, tk.E, tk.W))
 
-"""
+
 scrollbar1 = tk.Scrollbar(text1)
 scrollbar1.config(command=text1_1.yview)
 scrollbar1.config(command=text1_2.yview)
@@ -140,7 +163,7 @@ scrollbar1.grid(column = 3, row = 1, sticky = tk.NS)
 text1_1.config(yscrollcommand = scrollbar1.set)
 text1_2.config(yscrollcommand = scrollbar1.set)
 text1_3.config(yscrollcommand = scrollbar1.set)
-"""
+
 text2 = tk.Text(frame2)
 text2.grid(column = 1, row = 1, padx=5, pady=5, sticky = (tk.N, tk.S, tk.E, tk.W))
 
@@ -148,7 +171,7 @@ button1.bind("<Button-1>",pushButton)
 
 root.mainloop()
 
-"""
+
 
 url = "https://www.googleapis.com/youtube/v3/videos?part=liveStreamingDetails&id="
 url += "Vy1RbiSvHoU"
