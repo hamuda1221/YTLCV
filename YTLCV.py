@@ -18,8 +18,16 @@ from oauth2client import client
 from oauth2client.file import Storage
 import wx.lib.scrolledpanel as scrolled
 
+MAX_CHAT_AMOUNT = 60
 pageToken, http, url, ffffff, chat_no, rrrr = None, None, None, 0, 0, 0
+chat_list = []
+chat_list2 = []
+for i in range(MAX_CHAT_AMOUNT):
+    chat_list.append([])
+    chat_list2.append([])
+
 texttt = ""
+
 """
 def pushButton(event):
     #ボタンが押されたらコメントを読み取り始める
@@ -101,6 +109,7 @@ def roop():
     root.after(5000, roop)
     """
 
+
 #ウィンドの作成
 class MyApp(wx.Frame):
 
@@ -122,6 +131,12 @@ class MyApp(wx.Frame):
         self.panel2.SetBackgroundColour('#FFFFFF')
         #self.panel_chat = wx.BoxSizer(wx.VERTICAL)
         self.text = wx.StaticText(self.panel2, -1, label = texttt, size = (760, 900), pos = (0, 0))
+        self.text2 = wx.StaticText(self.panel2, -1, label = texttt, size = (760, 900), pos = (100, 0))
+        
+        font = wx.Font(16, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
+        self.text.SetFont(font)
+        self.text2.SetFont(font)
+        
         self.panel_ui1 = wx.BoxSizer(wx.HORIZONTAL)
         
         self.label_URL = wx.StaticText(self.panel, -1, "動画URL", size = (50, 20), pos = (0, 5))
@@ -169,6 +184,9 @@ class MyApp(wx.Frame):
         global chat_no
         global rrrr
         global texttt
+        global chat_list
+        global chat_list2
+        global MAX_CHAT_AMOUNT
 
         if rrrr != 0:
     
@@ -183,8 +201,16 @@ class MyApp(wx.Frame):
             json.dump(data.decode(), f)
             data = json.loads(data.decode())
             
+
             try:
                 for datum in data["items"]:
+                    
+                    j = MAX_CHAT_AMOUNT - 1
+                    while(j != 0):
+                        chat_list[j] = chat_list[j - 1]
+                        chat_list2[j] = chat_list2[j - 1]
+                        j -= 1
+                        
                     """
                     if datum["snippet"]["superChatDetails"] == True:
                         text1_1.insert(str(chat_no + 1) + ".0", str(chat_no) + "\n")
@@ -195,18 +221,25 @@ class MyApp(wx.Frame):
                         if datum["authorDetails"]["isChatModerator"] == True:
                             print("==========================================================")
     
-                        texttt = (str("\n") + str("    ") + str(chat_no) + str(" | ") +\
-                                  datum["authorDetails"]["displayName"] + str(" | ") +\
-                                  datum["snippet"]["textMessageDetails"]["messageText"] +\
-                                  texttt)
+                        chat_list[0] = (str(" ") + str(chat_no) + str(" | ") +\
+                                        datum["authorDetails"]["displayName"] + str("\n"))
+                        chat_list2[0] = (str(" | ") + datum["snippet"]["textMessageDetails"]["messageText"] +\
+                                        str("\n"))
+                        #print(chat_list)
                         #datum["authorDetails"]["profileImageUrl"])
                     except KeyError:
                         print("error")
-                        
+                    
+                    """
+                    texttt = ''.join(map(str, chat_list))
+                    texttt = ''.join(map(str, chat_list))
+                    """
+                    
                     chat_no += 1
                     #self.panel_chat.Add(text, proportion=0)
                     #self.panel_chat.Layout()
-                    self.text.SetLabel(texttt)
+                    self.text.SetLabel(''.join(map(str, chat_list)))
+                    self.text2.SetLabel(''.join(map(str, chat_list2)))
                     #print(text_array)
                     
                     pageToken = data["nextPageToken"]
