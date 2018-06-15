@@ -17,14 +17,19 @@ from oauth2client import tools
 from oauth2client import client
 from oauth2client.file import Storage
 import wx.lib.scrolledpanel as scrolled
+import urllib.request
 
-MAX_CHAT_AMOUNT = 60
-pageToken, http, url, ffffff, chat_no, rrrr = None, None, None, 0, 0, 0
+MAX_CHAT_AMOUNT = 56
+pageToken, http, url, ffffff, chat_no, rrrr, renchi = None, None, None, 0, 0, 0, ""
 chat_list = []
 chat_list2 = []
+chat_list3 = []
+chat_list4 = []
 for i in range(MAX_CHAT_AMOUNT):
     chat_list.append([])
     chat_list2.append([])
+    chat_list3.append([i])
+    chat_list4.append([])
 
 texttt = ""
 
@@ -122,20 +127,27 @@ class MyApp(wx.Frame):
         
         self.SetTitle('test')
         #self.SetBackgroundColour((21, 31, 42))
-        self.SetPosition((1080, 35))
-        self.SetSize((800, 1000))
+        self.SetPosition((318, 48))
+        self.SetSize((1600, 1000))
         
         self.panel = wx.Panel(self, size = (775, 30), pos = (5, 5), style = wx.BORDER_SIMPLE)
         self.panel2 = wx.Panel(self, -1, size = (775, 915), pos = (5, 40), style = wx.BORDER_SIMPLE)
+        self.panel3 = wx.Panel(self, -1, size = (775, 915), pos = (800, 40), style = wx.BORDER_SIMPLE)
         #self.panel2.SetupScrolling()
         self.panel2.SetBackgroundColour('#FFFFFF')
+        self.panel3.SetBackgroundColour('#FFFFFF')
         #self.panel_chat = wx.BoxSizer(wx.VERTICAL)
-        self.text = wx.StaticText(self.panel2, -1, label = texttt, size = (760, 900), pos = (0, 0))
-        self.text2 = wx.StaticText(self.panel2, -1, label = texttt, size = (760, 900), pos = (100, 0))
+        self.text = wx.StaticText(self.panel2, -1, label = texttt, size = (760, 900), pos = (0, 5))
+        self.text2 = wx.StaticText(self.panel2, -1, label = texttt, size = (760, 900), pos = (80, 5))
+        self.text3 = wx.StaticText(self.panel3, -1, label = texttt, size = (760, 900), pos = (0, 5))
+        #self.text4 = wx.StaticText(self.panel3, -1, label = texttt, size = (760, 900), pos = (100, 5))
         
-        font = wx.Font(16, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
+        font = wx.Font(12, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
         self.text.SetFont(font)
         self.text2.SetFont(font)
+        font2 = wx.Font(16, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
+        self.text3.SetFont(font2)
+        #self.text4.SetFont(font2)
         
         self.panel_ui1 = wx.BoxSizer(wx.HORIZONTAL)
         
@@ -169,7 +181,7 @@ class MyApp(wx.Frame):
         #コメント更新用
         self.timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.roop)
-        self.timer.Start(3000)
+        self.timer.Start(2000)
 
 
         self.Show(True)
@@ -186,7 +198,12 @@ class MyApp(wx.Frame):
         global texttt
         global chat_list
         global chat_list2
+        global chat_list3
+        global chat_list4
         global MAX_CHAT_AMOUNT
+        global renchi
+
+#        chat_list3[0][0] = ["a"]
 
         if rrrr != 0:
     
@@ -210,23 +227,28 @@ class MyApp(wx.Frame):
                         chat_list[j] = chat_list[j - 1]
                         chat_list2[j] = chat_list2[j - 1]
                         j -= 1
-                        
-                    """
-                    if datum["snippet"]["superChatDetails"] == True:
-                        text1_1.insert(str(chat_no + 1) + ".0", str(chat_no) + "\n")
-                        text1_3.insert(str(chat_no + 1) + ".0", str(datum["snippet"]["displayMessage"]) + "\n")
-                        #datum["authorDetails"]["profileImageUrl"])
-                    """
+                    
                     try:
-                        if datum["authorDetails"]["isChatModerator"] == True:
-                            print("==========================================================")
-    
-                        chat_list[0] = (str(" ") + str(chat_no) + str(" | ") +\
-                                        datum["authorDetails"]["displayName"] + str("\n"))
-                        chat_list2[0] = (str(" | ") + datum["snippet"]["textMessageDetails"]["messageText"] +\
-                                        str("\n"))
-                        #print(chat_list)
-                        #datum["authorDetails"]["profileImageUrl"])
+                        if datum["authorDetails"]["isChatModerator"] == True and\
+                           chat_list3[0] != chat_list3[1]:
+                               
+                            j = MAX_CHAT_AMOUNT - 1
+                            while(j != 0):
+                                chat_list3[j] = chat_list3[j - 1]
+                                j -= 1
+        
+                            chat_list3[0] = (" " + datum["authorDetails"]["displayName"] + str("\n") +\
+                                             str("         ") + datum["snippet"]["textMessageDetails"]["messageText"] +\
+                                             str("\n"))
+                            
+                        else:    
+    #                        urllib.request.urlopen(datum["authorDetails"]["profileImageUrl"]).read()    
+    #                       chat_list[0] = (str(" ") + str("{:3}".format(chat_no)) + str(" | ") +\
+                            chat_list[0] = (" " + datum["authorDetails"]["displayName"] + str("\n"))
+                            chat_list2[0] = (str(" | ") + datum["snippet"]["textMessageDetails"]["messageText"] +\
+                                            str("\n"))
+                            #print(chat_list)
+                            #datum["authorDetails"]["profileImageUrl"])
                     except KeyError:
                         print("error")
                     
@@ -240,6 +262,8 @@ class MyApp(wx.Frame):
                     #self.panel_chat.Layout()
                     self.text.SetLabel(''.join(map(str, chat_list)))
                     self.text2.SetLabel(''.join(map(str, chat_list2)))
+                    self.text3.SetLabel(''.join(map(str, chat_list3)))
+                    #self.text4.SetLabel(''.join(map(str, chat_list4)))
                     #print(text_array)
                     
                     pageToken = data["nextPageToken"]
