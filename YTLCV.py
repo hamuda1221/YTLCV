@@ -32,6 +32,7 @@ for i in range(MAX_CHAT_AMOUNT):
     chat_list4.append([])
 
 texttt = ""
+df = ""
 
 """
 def pushButton(event):
@@ -125,7 +126,7 @@ class MyApp(wx.Frame):
 
     def init_ui(self):
         
-        self.SetTitle('test')
+        self.SetTitle('YouTubeLiveCommentViewer')
         #self.SetBackgroundColour((21, 31, 42))
         self.SetPosition((318, 48))
         self.SetSize((1600, 1000))
@@ -134,8 +135,8 @@ class MyApp(wx.Frame):
         self.panel2 = wx.Panel(self, -1, size = (775, 915), pos = (5, 40), style = wx.BORDER_SIMPLE)
         self.panel3 = wx.Panel(self, -1, size = (775, 915), pos = (800, 40), style = wx.BORDER_SIMPLE)
         #self.panel2.SetupScrolling()
-        self.panel2.SetBackgroundColour('#FFFFFF')
-        self.panel3.SetBackgroundColour('#FFFFFF')
+        self.panel2.SetBackgroundColour('#000000')
+        self.panel3.SetBackgroundColour('#000000')
         #self.panel_chat = wx.BoxSizer(wx.VERTICAL)
         self.text = wx.StaticText(self.panel2, -1, label = texttt, size = (760, 900), pos = (0, 5))
         self.text2 = wx.StaticText(self.panel2, -1, label = texttt, size = (760, 900), pos = (80, 5))
@@ -148,6 +149,11 @@ class MyApp(wx.Frame):
         font2 = wx.Font(16, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
         self.text3.SetFont(font2)
         #self.text4.SetFont(font2)
+        self.text.SetForegroundColour('#FFFFFF')
+        self.text2.SetForegroundColour('#FFFFFF')
+        self.text3.SetForegroundColour('#FFFFFF')
+        
+        
         
         self.panel_ui1 = wx.BoxSizer(wx.HORIZONTAL)
         
@@ -181,7 +187,7 @@ class MyApp(wx.Frame):
         #コメント更新用
         self.timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.roop)
-        self.timer.Start(2000)
+        self.timer.Start(5000)
 
 
         self.Show(True)
@@ -202,6 +208,7 @@ class MyApp(wx.Frame):
         global chat_list4
         global MAX_CHAT_AMOUNT
         global renchi
+        global df
 
 #        chat_list3[0][0] = ["a"]
 
@@ -217,7 +224,8 @@ class MyApp(wx.Frame):
             f = open("data.json", "w")
             json.dump(data.decode(), f)
             data = json.loads(data.decode())
-            
+            with open('data.json') as f:
+                df = json.load(f)
 
             try:
                 for datum in data["items"]:
@@ -229,8 +237,22 @@ class MyApp(wx.Frame):
                         j -= 1
                     
                     try:
-                        if datum["authorDetails"]["isChatModerator"] == True and\
-                           chat_list3[0] != chat_list3[1]:
+                        
+                        if datum["snippet"]["type"] == "superChatEvent" and\
+                           (chat_list3[0] != chat_list3[1] or chat_list3[0] != chat_list3[2]):
+                                 
+                            j = MAX_CHAT_AMOUNT - 1
+                            while(j != 0):
+                                chat_list3[j] = chat_list3[j - 1]
+                                j -= 1
+                            chat_list3[0] = (" " + datum["authorDetails"]["displayName"] + str("\n") +\
+                                             str("         ") + datum["snippet"]["superChatDetails"]["amountDisplayString"] +\
+                                             str(":") + datum["snippet"]["superChatDetails"]["userComment"] +\
+                                             str("\n"))
+                            print("SC")
+                            #datum["authorDetails"]["profileImageUrl"])
+                            
+                        elif datum["authorDetails"]["isChatModerator"] == True and chat_list3[0] != chat_list3[1]:
                                
                             j = MAX_CHAT_AMOUNT - 1
                             while(j != 0):
@@ -240,7 +262,7 @@ class MyApp(wx.Frame):
                             chat_list3[0] = (" " + datum["authorDetails"]["displayName"] + str("\n") +\
                                              str("         ") + datum["snippet"]["textMessageDetails"]["messageText"] +\
                                              str("\n"))
-                            
+                        
                         else:    
     #                        urllib.request.urlopen(datum["authorDetails"]["profileImageUrl"]).read()    
     #                       chat_list[0] = (str(" ") + str("{:3}".format(chat_no)) + str(" | ") +\
